@@ -10,7 +10,6 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
 $LocalScript = Join-Path $env:TEMP "install_clickhouse_superset.sh"
 
 $BashScript = @"
@@ -66,9 +65,14 @@ if [ ! -d "\$VENV_PATH" ]; then
 fi
 
 source "\$VENV_PATH/bin/activate"
-pip install --upgrade pip setuptools wheel
-pip install apache-superset
 
+echo "==> Upgrade pip"
+pip install --upgrade pip setuptools wheel
+
+echo "==> Install Superset and ClickHouse driver"
+pip install apache-superset clickhouse-connect
+
+echo "==> Reset Superset metadata DB"
 rm -f "\$SUPERSET_HOME/superset.db"
 
 SECRET_KEY=\$(openssl rand -base64 42 | tr -d '\n')
@@ -118,9 +122,18 @@ RestartSec=5
 WantedBy=multi-user.target
 SERVICEEOF
 
+echo "==> Reload systemd and start Superset"
 sudo systemctl daemon-reload
 sudo systemctl enable superset
 sudo systemctl restart superset
+
+echo "==> Check services"
+sudo systemctl --no-pager --full status clickhouse-server | head -n 20 || true
+echo
+sudo systemctl --no-pager --full status superset | head -n 20 || true
+echo
+clickhouse-client -q "SELECT version()" || true
+curl -I http://127.0.0.1:\$SUPERSET_PORT/login/ || true
 
 echo
 echo "=== DONE ==="
@@ -128,9 +141,8 @@ echo "Superset URL: http://$HostIp:\$SUPERSET_PORT"
 echo "Admin username: \$ADMIN_USERNAME"
 echo "Admin password: \$ADMIN_PASSWORD"
 echo
-sudo systemctl --no-pager --full status clickhouse-server | head -n 20 || true
-echo
-sudo systemctl --no-pager --full status superset | head -n 20 || true
+echo "ClickHouse connection URI for Superset:"
+echo "clickhousedb://default:@localhost:8123/default"
 "@
 
 Set-Content -Path $LocalScript -Value $BashScript -Encoding UTF8
@@ -145,3 +157,6 @@ Write-Host ""
 Write-Host "Done. Open: http://${HostIp}:${SupersetPort}" -ForegroundColor Green
 Write-Host "Login: $AdminUsername" -ForegroundColor Green
 Write-Host "Password: $AdminPassword" -ForegroundColor Green
+Write-Host ""
+Write-Host "Superset ClickHouse URI:" -ForegroundColor Yellow
+Write-Host "clickhousedb://default:@localhost:8123/default" -ForegroundColor Yellow
