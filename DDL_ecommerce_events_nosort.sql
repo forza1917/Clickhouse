@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS default.ecommerce_events_nosort; 
 CREATE TABLE default.ecommerce_events_nosort
 (
     `event_time` DateTime,
@@ -12,4 +13,4 @@ CREATE TABLE default.ecommerce_events_nosort
 )
 ENGINE = MergeTree
 ORDER BY tuple()
-SETTINGS index_granularity = 8192
+SETTINGS index_granularity = 8192;
