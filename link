@@ -1,1 +1,4 @@
 https://www.kaggle.com/datasets/mkechinov/ecommerce-behavior-data-from-multi-category-store
+eCommerce behavior data from multi category store 
+285 million events, на практике это много гигабайт. Источник также фигурирует как 9 GB в одном из аналитических гайдов. 
+События пользователей в e-commerce: просмотры, клики, покупки.
