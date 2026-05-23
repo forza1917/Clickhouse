@@ -1,4 +1,4 @@
-statement
+DROP TABLE IF EXISTS CREATE TABLE default.ecommerce_events_sorted; 
 CREATE TABLE default.ecommerce_events_sorted
 (
     `event_time` DateTime,
