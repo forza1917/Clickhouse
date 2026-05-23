@@ -50,6 +50,6 @@ CREATE TABLE default.ecommerce_events_sorted
     )
 )
 ENGINE = MergeTree
-PARTITION BY toStartOfMonth(event_time)
+PARTITION BY toDate(event_time)
 ORDER BY (event_type, event_time, user_id)
 SETTINGS index_granularity = 8192
