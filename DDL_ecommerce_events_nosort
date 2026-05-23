@@ -1,0 +1,15 @@
+CREATE TABLE default.ecommerce_events_nosort
+(
+    `event_time` DateTime,
+    `event_type` LowCardinality(String),
+    `product_id` UInt64,
+    `category_id` UInt64,
+    `category_code` Nullable(String),
+    `brand` Nullable(String),
+    `price` Float64,
+    `user_id` UInt64,
+    `user_session` UUID
+)
+ENGINE = MergeTree
+ORDER BY tuple()
+SETTINGS index_granularity = 8192
