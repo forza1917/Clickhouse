@@ -1,0 +1,53 @@
+CREATE TABLE default.ecommerce_events_sorted
+(
+    `event_time` DateTime,
+    `event_type` LowCardinality(String),
+    `product_id` UInt64,
+    `category_id` UInt64,
+    `category_code` Nullable(String),
+    `brand` Nullable(String),
+    `price` Float64,
+    `user_id` UInt64,
+    `user_session` UUID,
+    `dt` Date ALIAS toDate(event_time),
+    PROJECTION p_day_type_brand
+    (
+        SELECT
+            toDate(event_time) AS dt,
+            event_type,
+            brand,
+            category_code,
+            count() AS events,
+            sum(price) AS revenue
+        GROUP BY
+            dt,
+            event_type,
+            brand,
+            category_code
+    ),
+    PROJECTION p_dt_type_rev
+    (
+        SELECT
+            toDate(event_time) AS dt,
+            event_type,
+            count() AS events,
+            sum(price) AS revenue
+        GROUP BY
+            dt,
+            event_type
+    ),
+    PROJECTION p_dt_type
+    (
+        SELECT
+            dt,
+            event_type,
+            count(),
+            sum(price)
+        GROUP BY
+            dt,
+            event_type
+    )
+)
+ENGINE = MergeTree
+ORDER BY (event_type, event_time, user_id)
+SETTINGS index_granularity = 8192
