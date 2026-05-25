@@ -1,0 +1,31 @@
+--sorted
+WITH
+    toDateTimeOrDefault({from:String}, '', now() - {seconds:UInt32}) AS from,
+    toDateTimeOrDefault({to:String},   '', now()) AS to
+SELECT
+    toStartOfInterval(event_time, INTERVAL {rounding:UInt32} SECOND)::INT AS t,
+    avg(query_duration_ms) AS avg_ms
+FROM system.query_log
+WHERE event_date BETWEEN toDate(from) AND toDate(to)
+  AND event_time BETWEEN from AND to
+  AND type = 'QueryFinish'
+  AND query_kind = 'Select'
+  AND log_comment = 'datasource_sorted'
+GROUP BY t
+ORDER BY t WITH FILL STEP {rounding:UInt32}
+
+--nosorted
+WITH
+    toDateTimeOrDefault({from:String}, '', now() - {seconds:UInt32}) AS from,
+    toDateTimeOrDefault({to:String},   '', now()) AS to
+SELECT
+    toStartOfInterval(event_time, INTERVAL {rounding:UInt32} SECOND)::INT AS t,
+    avg(query_duration_ms) AS avg_ms
+FROM system.query_log
+WHERE event_date BETWEEN toDate(from) AND toDate(to)
+  AND event_time BETWEEN from AND to
+  AND type = 'QueryFinish'
+  AND query_kind = 'Select'
+  AND log_comment = 'datasource_nosorted'
+GROUP BY t
+ORDER BY t WITH FILL STEP {rounding:UInt32}
