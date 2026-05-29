@@ -5,5 +5,6 @@ run_benchmark_sorted.sh
 
 
 run_benchmark_nosorted.sh
-<img width="935" height="439" alt="image" src="https://github.com/user-attachments/assets/07856ab4-2014-4244-ae2b-ecb64a594e45" />
+<img width="967" height="457" alt="image" src="https://github.com/user-attachments/assets/91446f80-1086-469c-a3b1-4edeb8408c79" />
+
 Порог слома 1-2 сессий, p99 растет линейно 25%, 50%, 75%. QPS низкий, всего 4 сессии. 
